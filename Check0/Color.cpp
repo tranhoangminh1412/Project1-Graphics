@@ -41,18 +41,14 @@ Color Color::operator*(float scalar) const {
     return result;
 }
 
-int main() {
-    Color c1(1.0f, 0.25f, 0.25f);
-    Color c2(0.0f, 0.5f, 1.0f);
-    Color c3 = c1 + c2;
-    cout << "Red: " << c3.red << ", Green: " << c3.green << ", Blue: " << c3.blue << endl;
+// int main() {
+//     Color c1(1.0f, 0.25f, 0.25f);
+//     Color c2(0.0f, 0.5f, 1.0f);
+//     Color c3 = c1 + c2;
+//     cout << "Red: " << c3.red << ", Green: " << c3.green << ", Blue: " << c3.blue << endl;
     
-    Color c4 = Red;  // Should initialize to pure red
-    cout << "Red: " << c4.red << ", Green: " << c4.green << ", Blue: " << c4.blue << endl;
+//     Color c4 = Red;  // Should initialize to pure red
+//     cout << "Red: " << c4.red << ", Green: " << c4.green << ", Blue: " << c4.blue << endl;
 
-    return 0;
-}
-
-int main(){
-    
-}
+//     return 0;
+// }
