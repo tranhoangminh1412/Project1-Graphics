@@ -3,62 +3,67 @@
 #include "Color.cpp"
 #include <iostream>
 #include <fstream>
+#include <cmath> 
+#define M_PI 3.14159265358979323846
+#define _USE_MATH_DEFINES
 
-// Default constructor: creates an empty raster
 Raster::Raster() : width(0), height(0), pixels(nullptr) {}
 
-// Constructor that initializes the raster with a width, height, and fill color
-Raster::Raster(int pWidth, int pHeight, const Color& pFillColor)
-    : width(pWidth), height(pHeight) {
-    pixels = new Color[width * height]; // 1D array to hold Color objects
-    clear(pFillColor); // Fill the raster with the specified color
+Raster::Raster(int pWidth, int pHeight, const Color &pFillColor)
+    : width(pWidth), height(pHeight)
+{
+    pixels = new Color[width * height]; 
+    clear(pFillColor);                  
 }
 
-// Destructor to free allocated memory
-Raster::~Raster() {
+Raster::~Raster()
+{
     delete[] pixels;
 }
 
-// Getter for width
-int Raster::getWidth() const {
+int Raster::getWidth() const
+{
     return width;
 }
 
-// Getter for height
-int Raster::getHeight() const {
+int Raster::getHeight() const
+{
     return height;
 }
 
-// Method to get the color of a pixel at position (x, y)
-Color Raster::getColorPixel(int x, int y) const {
-    // Convert (x, y) to 1D index: index = y * width + x
-    return pixels[y * width + x];
+Color Raster::getColorPixel(int x, int y) const
+{
+    int index = (height - 1 - y) * width + x;
+    return pixels[index];
 }
 
-// Method to set the color of a pixel at position (x, y)
-void Raster::setColorPixel(int x, int y, const Color& pFillColor) {
-    // Convert (x, y) to 1D index: index = y * width + x
-    pixels[y * width + x] = pFillColor;
+void Raster::setColorPixel(int x, int y, const Color &pFillColor)
+{
+    int index = (height - 1 - y) * width + x;
+    pixels[index] = pFillColor;
 }
 
-// Clears the raster by setting all pixels to a specified color
-void Raster::clear(const Color& pFillColor) {
-    for (int i = 0; i < width * height; ++i) {
+void Raster::clear(const Color &pFillColor)
+{
+    for (int i = 0; i < width * height; ++i)
+    {
         pixels[i] = pFillColor;
     }
 }
 
-// Method to write the raster to a PPM file
-void Raster::writeToPPM(const std::string& filename) const {
+void Raster::writeToPPM(const std::string &filename) const
+{
     std::ofstream outFile(filename);
 
-    if (outFile.is_open()) {
-        // Write the PPM header
-        outFile << "P3\n" << width << " " << height << "\n255\n";
+    if (outFile.is_open())
+    {
+        outFile << "P3\n"
+                << width << " " << height << "\n255\n";
 
-        // Write the pixel data
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
+        for (int y = height - 1; y >= 0; --y)
+        { // Start from bottom row
+            for (int x = 0; x < width; ++x)
+            {
                 Color color = getColorPixel(x, y);
                 outFile << static_cast<int>(color.red * 255) << " "
                         << static_cast<int>(color.green * 255) << " "
@@ -68,20 +73,39 @@ void Raster::writeToPPM(const std::string& filename) const {
         }
         outFile.close();
         std::cout << "PPM file written: " << filename << std::endl;
-    } else {
+    }
+    else
+    {
         std::cerr << "Error: Could not open the file for writing!" << std::endl;
     }
 }
 
+void Raster::drawLine_DDA(float x1, float y1, float x2, float y2, const Color &fillColor)
+{
+    float dx = x2 - x1;
+    float dy = y2 - y1;
+
+    int steps = std::max(std::abs(dx), std::abs(dy));
+
+    float xIncrement = dx / steps;
+    float yIncrement = dy / steps;
+
+    float x = x1;
+    float y = y1;
+
+    setColorPixel(std::round(x), std::round(y), fillColor);
+
+    for (int i = 0; i < steps; ++i)
+    {
+        x += xIncrement;
+        y += yIncrement;
+        setColorPixel(std::round(x), std::round(y), fillColor);
+    }
+}
+
+
 int main() {
-    // Create a 10x10 raster and fill it with blue
-    Raster raster(10, 10, Blue);
-
-    // Change the color of a pixel at (5, 5) to red
-    raster.setColorPixel(5, 5, Red);
-
-    // Write the raster to a PPM file
-    raster.writeToPPM("output.ppm");
+    Raster raster(100, 100, Red);
 
     return 0;
 }
